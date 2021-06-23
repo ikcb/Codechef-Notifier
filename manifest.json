@@ -1,0 +1,16 @@
+{
+    "name": "Vipin's Extension",
+    "description": "Build an Extension!",
+    "version": "1.0",
+    "manifest_version": 2,
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": true
+    },
+
+    "permissions": ["storage",
+        "webRequest",
+        "https://www.codechef.com/error_status_table/*"
+        
+    ]
+  }
