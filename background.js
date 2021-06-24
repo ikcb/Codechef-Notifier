@@ -1,5 +1,7 @@
 console.log("Background is running");
 
+
+
 chrome.webRequest.onBeforeSendHeaders.addListener((details) =>{
 
     // check the URL from details object
@@ -11,11 +13,34 @@ chrome.webRequest.onBeforeSendHeaders.addListener((details) =>{
 
     var pathArray = url.pathname.split('/');
 
-    let Id =  pathArray[pathArray.length - 2];
+    let id =  pathArray[pathArray.length - 2];
 
-         
+    var store={};
+    store[id]=id;
 
-  });
+    // check if a request with that submission id is already present in your storage
+    //  The above check is necessary because codechef repeatedly sends this
+    //  request until the result is obtained.
+
+   
+          
+    chrome.storage.sync.get(id,function(key_values){
+      console.log(typeof key_values[id])
+      if(Object.keys(key_values).length!=0)
+      {
+          console.log(key_values[id])
+          // checkResult(id,csrf_token,url_string)
+      }
+      else{
+        chrome.storage.sync.set(store, function() {
+
+          console.log('Value is set to ' + id);
+          
+        });
+        sendMessagetToGetInfo();
+      }
+    })
+    
 
 },
 {
