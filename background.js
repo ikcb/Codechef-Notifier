@@ -3,7 +3,7 @@ console.log("Background is running");
 
 function sendMessagetToGetInfo(id){
 
-  chrome.tabs.query({url: "https://www.codechef.com/*/submit/*", active: true, currentWindow: true}, function(tabs) {
+  chrome.tabs.query({url: "https://www.codechef.com/*/submit/*", title : "CodeChef | Competitive Programming | Participate & Learn | CodeChef"}, function(tabs) {
 
     console.log(tabs);
 
