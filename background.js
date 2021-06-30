@@ -1,7 +1,7 @@
 console.log("Background is running");
 
 
-function sendMessagetToGetInfo(id){
+function sendMessagetToGetInfo(url, id, xcsrf){
 
   chrome.tabs.query({url: "https://www.codechef.com/*/submit/*", title : "CodeChef | Competitive Programming | Participate & Learn | CodeChef"}, function(tabs) {
 
@@ -10,10 +10,43 @@ function sendMessagetToGetInfo(id){
     chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(response) {
 
       console.log(response);
+      
      
+
       });
+
+      checkResult(url, id, xcsrf);
     });
   
+}
+
+function checkResult(url, id, xcsrf){
+  $.ajax({
+ 
+    url: url,
+
+    dataType: "json",
+
+    headers: {
+      "x-csrf-token" : xcsrf
+    },
+
+    /*
+    * function to handle success of XHR request
+    * check if the response shows verdict available
+    * if verdict available then notify user else
+    * user setTimeout function to do recursive call
+    * to this function after some seconds.
+    */
+    success: function(data, status, XHR){
+        console.log(data, status);
+    },
+
+    /* function to handle errors*/
+    error: function(XHR, status, error){
+      console.log(error, status, XHR);
+    }
+});
 }
 
 
@@ -22,26 +55,20 @@ chrome.webRequest.onBeforeSendHeaders.addListener((details) =>{
     // check the URL from details object
     //  if the url matches the required codechef url then
     //  extract the submission id from the url
-    const req = "error_status_table";
-
     const url = new URL(details.url);
+  // console.log(url);
+   
 
-    console.log(url.href);
-
-    var pathArray = url.pathname.split('/');
-
-    if(req == pathArray[pathArray.length - 3]){
-      console.log(details);
+    if(url.search.length > 0){
     
-     
-
-      let id =  pathArray[pathArray.length - 2];
+    
+      let id = url.searchParams.get('solution_id');
       let xcsrf =  details.requestHeaders[2].value;
 
-      // console.log("xcsrf ", xcsrf);
-
+      
       var store={};
       store[id]=id;
+    
 
       // check if a request with that submission id is already present in your storage
       //  The above check is necessary because codechef repeatedly sends this
@@ -50,11 +77,11 @@ chrome.webRequest.onBeforeSendHeaders.addListener((details) =>{
     
             
       chrome.storage.sync.get(id,function(key_values){
-        console.log(typeof key_values[id])
+     
         if(Object.keys(key_values).length!=0)
         {
             console.log(key_values[id])
-            // checkResult(id,csrf_token,url_string)
+            checkResult(id,xcsrf,url)
         }
         else{
           chrome.storage.sync.set(store, function() {
@@ -62,7 +89,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener((details) =>{
             console.log('Value is set to ' + id);
             
           });
-          sendMessagetToGetInfo(id);
+          sendMessagetToGetInfo(url, id, xcsrf);
         }
       })
     }
@@ -70,7 +97,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener((details) =>{
 
 },
 {
-    urls : ["https://www.codechef.com/*"],
+    urls : ["https://www.codechef.com/api/ide/submit*"],
     types : ["xmlhttprequest"]
 },
 ["requestHeaders"]);
