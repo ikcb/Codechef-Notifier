@@ -12,19 +12,17 @@
         }
     ],
     "background": {
-        "scripts": ["background.js", "popup.js", "jQuery-3.6.0.js"],
+        "scripts": ["background.js", "jQuery-3.6.0.js"],
         "persistent": true
     },
    "permissions": ["storage",
         "webRequest",
         "tabs",
-        "activeTab",
+        "notifications",
         "https://www.codechef.com/*"
         
     ],
     "browser_action": {
-        "default_icon": "Vipin.jpg",
-        "default_popup" : "popup.html"
-        
+        "default_icon": "Vipin.jpg"
     }
   }
