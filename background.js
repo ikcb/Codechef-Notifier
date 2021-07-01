@@ -5,15 +5,16 @@ function sendMessagetToGetInfo(url, id, xcsrf){
 
   chrome.tabs.query({url: "https://www.codechef.com/*/submit/*", title : "CodeChef | Competitive Programming | Participate & Learn | CodeChef"}, function(tabs) {
 
-    console.log(tabs);
+    // console.log(tabs);
     var problem_details = {};
+    var problem_url = url;
     chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(response) {
 
-      // console.log(typeof response);
+      console.log('preoblem details', response);
 
       problem_details = response;
       //  console.log("problem_details ", problem_details);
-      checkResult(url, id, xcsrf, problem_details);
+      checkResult(url, id, xcsrf, problem_details, problem_url);
 
     });
      
@@ -22,7 +23,7 @@ function sendMessagetToGetInfo(url, id, xcsrf){
   
 }
 
-function checkResult(url, id, xcsrf, problem_details){
+function checkResult(url, id, xcsrf, problem_details, problem_url){
   $.ajax({
  
     url: url,
@@ -41,22 +42,17 @@ function checkResult(url, id, xcsrf, problem_details){
     * to this function after some seconds.
     */
     success: function(data, status, XHR){
-        console.log(data, status);
+        console.log(status, data.result_code);
 
         if(data.result_code == "wait"){
-          checkResult(url, id, xcsrf, problem_details);
-        //   chrome.alarms.create("alarm", {periodInMinutes:0.5});
-        //   chrome.alarms.onAlarm.addListener(function(alarm){
-           
-        // });
-          // setTimeout(checkResult(url, id, xcsrf), 4000);
+          checkResult(url, id, xcsrf, problem_details, problem_url);
         }
         else{
            var notify_details  = {
             type: "list",
             title: "Problem Name: "+problem_details.name+".",
             message: "Verdict: "+data.result_code+".",
-            iconUrl: "Vipin.jpg",
+            iconUrl: "logo.jpg",
             items: [{title: "Verdict: ", message: ""+data.result_code+""},
                     { title: "Id: ", message: ""+problem_details.id+""},
                     { title: "Time: ", message: ""+data.time+""}]
@@ -66,11 +62,12 @@ function checkResult(url, id, xcsrf, problem_details){
               function(details){ console.log(details); }
             )
 
-           chrome.notifications.onButtonClicked.addListener(function(){
-            chrome.tabs.create({
-              url : "https://www.codechef.com/*/submit/*"
-            });
-           });
+          //  chrome.notifications.onButtonClicked.addListener(function(problem_url){
+          //   console.log(problem_url);
+          //   chrome.tabs.create({
+          //     url : problem_url
+          //   });
+          //  });
         }
 
     },
@@ -91,7 +88,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener((details) =>{
     //  if the url matches the required codechef url then
     //  extract the submission id from the url
     const url = new URL(details.url);
-    console.log(url);
+    // console.log(url);
    
 
     if(url.search.length > 0){
@@ -115,13 +112,12 @@ chrome.webRequest.onBeforeSendHeaders.addListener((details) =>{
      
         if(Object.keys(key_values).length!=0)
         {
-            console.log(key_values[id])
-            // checkResult(id,xcsrf,url)
+            // console.log('submission id already saved',key_values[id])
         }
         else{
           chrome.storage.sync.set(store, function() {
 
-            console.log('Value is set to ' + id);
+            console.log('Value is now set to ' + id);
             
           });
           sendMessagetToGetInfo(url, id, xcsrf);

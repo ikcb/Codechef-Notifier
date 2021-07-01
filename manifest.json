@@ -1,6 +1,6 @@
 {
     "name": "Vipin's Extension",
-    "description": "Build an Extension!",
+    "description": "Extension for codechef notifictions",
     "version": "1.0",
     "manifest_version": 2,
     "content_scripts" : [
@@ -23,6 +23,6 @@
         
     ],
     "browser_action": {
-        "default_icon": "Vipin.jpg"
+        "default_icon": "logo.jpg"
     }
   }
